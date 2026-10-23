@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   push:
     branches: [dev]
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +23,8 @@ jobs:
         run: keytool -genkeypair -keystore "$NUVIO_RELEASE_STORE_FILE" -alias "$NUVIO_RELEASE_KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 -storepass "$NUVIO_RELEASE_STORE_PASSWORD" -keypass "$NUVIO_RELEASE_KEY_PASSWORD" -dname "CN=Hobi TV"
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew && ./gradlew :app:assembleFullDebug
-      - uses: actions/upload-artifact@v4
+      - uses: softprops/action-gh-release@v2
         with:
-          name: apk
-          path: app/build/outputs/apk/**/*.apk
+          tag_name: latest
+          name: Son derleme
+          files: app/build/outputs/apk/**/*.apk
