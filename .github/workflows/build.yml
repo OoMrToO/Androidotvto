@@ -6,12 +6,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NUVIO_RELEASE_STORE_FILE: ${{ github.workspace }}/ci-release.jks
+      NUVIO_RELEASE_KEY_ALIAS: hobitv
+      NUVIO_RELEASE_KEY_PASSWORD: hobitv-temp-2026
+      NUVIO_RELEASE_STORE_PASSWORD: hobitv-temp-2026
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+      - name: Create signing key
+        run: keytool -genkeypair -keystore "$NUVIO_RELEASE_STORE_FILE" -alias "$NUVIO_RELEASE_KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 -storepass "$NUVIO_RELEASE_STORE_PASSWORD" -keypass "$NUVIO_RELEASE_KEY_PASSWORD" -dname "CN=Hobi TV"
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew && ./gradlew :app:assembleFullDebug
       - uses: actions/upload-artifact@v4
