@@ -1,4 +1,4 @@
-package com.nuvio.tv.ui.components
+Package com.nuvio.tv.ui.components
 
 import com.nuvio.tv.ui.theme.NuvioTheme
 
@@ -111,10 +111,9 @@ fun HeroCarousel(
         items.getOrNull(activeIndex)?.let { currentOnActiveItemChanged(it) }
     }
 
-    // Auto-advance when not focused — delay first advance to 20s so initial GPU load settles
     LaunchedEffect(isFocused, items.size) {
         if (items.size <= 1) return@LaunchedEffect
-        delay(AUTO_ADVANCE_INTERVAL_MS * 2) // 20s before first advance
+        delay(AUTO_ADVANCE_INTERVAL_MS * 2)
         while (true) {
             delay(AUTO_ADVANCE_INTERVAL_MS)
             if (!isFocused) {
@@ -131,7 +130,7 @@ fun HeroCarousel(
                 else
                     Modifier.fillMaxWidth()
             )
-            .height(400.dp)
+            .height(420.dp) // Apple TV tarzı biraz daha görkemli yükseklik
             .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
             .onFocusChanged {
                 isFocused = it.hasFocus || it.isFocused
@@ -166,10 +165,9 @@ fun HeroCarousel(
                 }
             }
     ) {
-        // Crossfade between slides
         Crossfade(
             targetState = activeIndex,
-            animationSpec = tween(300),
+            animationSpec = tween(400), // Daha akıcı sinematik geçiş
             label = "heroSlide"
         ) { index ->
             val item = items.getOrNull(index) ?: return@Crossfade
@@ -182,21 +180,20 @@ fun HeroCarousel(
             )
         }
 
-        // Indicator dots — optimized to minimize recompositions and layout passes
         val focusRingBrush = NuvioTheme.focusRing.brush()
-        val dotColorInactive = remember { Color.White.copy(alpha = 0.3f) }
-        val dotShape = remember { RoundedCornerShape(3.dp) }
+        val dotColorInactive = remember { Color.White.copy(alpha = 0.25f) }
+        val dotShape = remember { RoundedCornerShape(4.dp) }
         Row(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = NuvioTheme.spacing.lg),
+                .align(Alignment.BottomEnd) // Apple TV tarzı sağ alt hizalama
+                .padding(end = NuvioTheme.spacing.xxxl, bottom = NuvioTheme.spacing.lg),
             horizontalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.sm)
         ) {
             repeat(items.size) { index ->
                 val isActive = index == activeIndex
                 val useGradient = isActive
                 val dotColor = when {
-                    isActive -> null // use gradient brush
+                    isActive -> null
                     else -> dotColorInactive
                 }
                 val dotWidth = when {
@@ -232,9 +229,9 @@ private fun HeroCarouselSlide(
     val context = LocalContext.current
     val density = LocalDensity.current
     val logoRequestWidthPx = remember(density) {
-        with(density) { 220.dp.roundToPx() }.coerceAtLeast(1)
+        with(density) { 240.dp.roundToPx() }.coerceAtLeast(1)
     }
-    val logoRequestHeightPx = remember(density) { with(density) { 100.dp.roundToPx() }.coerceAtLeast(1) }
+    val logoRequestHeightPx = remember(density) { with(density) { 110.dp.roundToPx() }.coerceAtLeast(1) }
 
     val logoModel = remember(context, item.logo, logoRequestWidthPx, logoRequestHeightPx) {
         item.logo?.let {
@@ -290,7 +287,7 @@ private fun HeroCarouselSlide(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(start = NuvioTheme.spacing.xxxl, bottom = NuvioTheme.spacing.xxxl, end = NuvioTheme.spacing.xxxl)
-                .fillMaxWidth(0.42f),
+                .fillMaxWidth(0.48f),
             verticalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.sm)
         ) {
             if (showLogo) {
@@ -299,8 +296,8 @@ private fun HeroCarouselSlide(
                     contentDescription = item.name,
                     onError = { logoLoadFailed = true },
                     modifier = Modifier
-                        .height(100.dp)
-                        .widthIn(min = 100.dp, max = 220.dp)
+                        .height(110.dp)
+                        .widthIn(min = 120.dp, max = 240.dp)
                         .fillMaxWidth(),
                     contentScale = ContentScale.Fit,
                     alignment = Alignment.CenterStart
@@ -393,8 +390,8 @@ private fun HeroCarouselSlide(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         textDirection = description.contentTextDirection()
                     ),
-                    color = NuvioTheme.colors.TextPrimary,
-                    maxLines = 4,
+                    color = NuvioTheme.colors.TextPrimary.copy(alpha = 0.9f),
+                    maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
             }
@@ -405,114 +402,3 @@ private fun HeroCarouselSlide(
 @Composable
 private fun HeroCarouselMetaDivider() {
     Box(
-        modifier = Modifier
-            .size(NuvioTheme.spacing.xs.coerceAtLeast(NuvioTheme.spacing.xxs))
-            .clip(RoundedCornerShape(percent = 50))
-            .background(NuvioTheme.colors.TextTertiary.copy(alpha = 0.78f))
-    )
-}
-
-@Composable
-internal fun HeroCarouselBackdrop(
-    item: MetaPreview,
-    fullPage: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    val density = LocalDensity.current
-    val configuration = LocalConfiguration.current
-    val requestWidthPx = remember(configuration.screenWidthDp, density) {
-        with(density) { configuration.screenWidthDp.dp.roundToPx() }.coerceAtLeast(1)
-    }
-    val requestHeightPx = remember(configuration.screenHeightDp, density, fullPage) {
-        val height = if (fullPage) configuration.screenHeightDp.dp else 400.dp
-        with(density) { height.roundToPx() }.coerceAtLeast(1)
-    }
-    val backdropUrl = item.backdropUrl
-    val backgroundModel = remember(context, backdropUrl, requestWidthPx, requestHeightPx, fullPage) {
-        ImageRequest.Builder(context)
-            .data(backdropUrl)
-            .crossfade(false)
-            .size(width = requestWidthPx, height = requestHeightPx)
-            .apply {
-                if (fullPage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    colorSpace(ColorSpace.get(ColorSpace.Named.SRGB))
-                }
-            }
-            .build()
-    }
-    val bgColor = NuvioTheme.colors.Background
-
-    Box(
-        modifier = modifier
-            .graphicsLayer {
-                compositingStrategy = CompositingStrategy.Offscreen
-            }
-            .drawWithCache {
-            val bottomStartFraction = if (fullPage) 0.55f else 0.30f
-            val leftEndFraction = if (fullPage) 0.66f else 0.72f
-            val bottomStartY = size.height * bottomStartFraction
-            val leftEndX = size.width * leftEndFraction
-            val bottomGradient = Brush.verticalGradient(
-                colorStops = if (fullPage) {
-                    arrayOf(
-                        0.0f to Color.Transparent,
-                        0.4222f to bgColor.copy(alpha = 0.32f),
-                        0.7778f to bgColor.copy(alpha = 0.62f),
-                        1.0f to bgColor.copy(alpha = 0.78f)
-                    )
-                } else {
-                    arrayOf(
-                        0.0f to Color.Transparent,
-                        0.4286f to bgColor.copy(alpha = 0.5f),
-                        0.7143f to bgColor.copy(alpha = 0.85f),
-                        1.0f to bgColor
-                    )
-                },
-                startY = bottomStartY,
-                endY = size.height
-            )
-            val leftGradient = Brush.horizontalGradient(
-                colorStops = if (fullPage) {
-                    arrayOf(
-                        0.0f to bgColor.copy(alpha = 0.98f),
-                        0.2424f to bgColor.copy(alpha = 0.88f),
-                        0.5152f to bgColor.copy(alpha = 0.56f),
-                        0.7879f to bgColor.copy(alpha = 0.20f),
-                        1.0f to Color.Transparent
-                    )
-                } else {
-                    arrayOf(
-                        0.0f to bgColor.copy(alpha = 0.98f),
-                        0.2222f to bgColor.copy(alpha = 0.88f),
-                        0.4722f to bgColor.copy(alpha = 0.56f),
-                        0.7778f to bgColor.copy(alpha = 0.20f),
-                        1.0f to Color.Transparent
-                    )
-                },
-                startX = 0f,
-                endX = leftEndX
-            )
-            onDrawWithContent {
-                drawContent()
-                drawRect(
-                    brush = bottomGradient,
-                    topLeft = Offset(0f, bottomStartY),
-                    size = Size(size.width, size.height - bottomStartY)
-                )
-                drawRect(
-                    brush = leftGradient,
-                    size = Size(leftEndX, size.height)
-                )
-            }
-        }
-    ) {
-        AsyncImage(
-            model = backgroundModel,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.TopCenter
-        )
-    }
-}
