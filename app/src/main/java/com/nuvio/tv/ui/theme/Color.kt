@@ -104,21 +104,23 @@ class NuvioColorScheme(
     amoledMode: Boolean = false,
     amoledSurfacesMode: Boolean = false
 ) {
-    private val pureBlack = NuvioPrimitives.black
-    private val pureBlackSurfaces = amoledMode && amoledSurfacesMode
+    // Apple TV + Netflix Karışımı Sinematik Saf Siyah ve Derin Gri Tonları
+    private val pureBlack = Color(0xFF000000)
+    private val cinematicSurface = Color(0xFF121216) // Kart ve yüzeyler için lüks koyu gri
+    private val cinematicCard = Color(0xFF18181C)    // Kart arka planı
 
-    val Background = if (amoledMode) pureBlack else palette.background
-    val BackgroundElevated = if (pureBlackSurfaces) pureBlack else palette.backgroundElevated
-    val BackgroundCard = if (pureBlackSurfaces) pureBlack else palette.backgroundCard
-    val Surface = if (pureBlackSurfaces) pureBlack else palette.surface
-    val SurfaceVariant = if (pureBlackSurfaces) pureBlack else palette.surfaceVariant
-    val Panel = if (pureBlackSurfaces) pureBlack else palette.panel
+    val Background = pureBlack
+    val BackgroundElevated = cinematicSurface
+    val BackgroundCard = cinematicCard
+    val Surface = cinematicSurface
+    val SurfaceVariant = Color(0xFF1F1F24)
+    val Panel = cinematicSurface
     val Overlay = palette.overlay
-    val Field = if (pureBlackSurfaces) pureBlack else palette.field
-    val Menu = if (pureBlackSurfaces) pureBlack else palette.menu
-    val Modal = if (pureBlackSurfaces) pureBlack else palette.modal
+    val Field = Color(0xFF1A1A1E)
+    val Menu = cinematicSurface
+    val Modal = cinematicSurface
     val PlayerOverlay = palette.playerOverlay
-    val Divider = NuvioPrimitives.neutral750
+    val Divider = Color(0xFF2C2C35)
 
     val Primary = NuvioPrimitives.neutral500
     val PrimaryVariant = NuvioPrimitives.neutral650
@@ -129,7 +131,7 @@ class NuvioColorScheme(
     val OnSecondaryVariant = palette.onSecondaryVariant
 
     val TextPrimary = NuvioPrimitives.white
-    val TextSecondary = NuvioPrimitives.neutral400
+    val TextSecondary = Color(0xFFA0A0AB) // Apple tarzı daha okunabilir yumuşak gri
     val TextTertiary = NuvioPrimitives.neutral600
     val TextDisabled = NuvioPrimitives.neutral700
     val TextInverse = NuvioPrimitives.neutral925
@@ -150,13 +152,13 @@ class NuvioColorScheme(
     val Torrent = NuvioPrimitives.torrent
     val Premium = NuvioPrimitives.premium
 
-    val Border = NuvioPrimitives.neutral750
+    val Border = Color(0xFF2C2C35)
     val BorderFocused = FocusRing
-    val BorderMuted = NuvioPrimitives.neutral750.copy(alpha = 0.58f)
+    val BorderMuted = Color(0xFF2C2C35).copy(alpha = 0.58f)
 
-    val Scrim = NuvioPrimitives.black.copy(alpha = 0.62f)
-    val ImageScrim = NuvioPrimitives.black.copy(alpha = 0.58f)
-    val VideoControlsScrim = NuvioPrimitives.black.copy(alpha = 0.72f)
+    val Scrim = NuvioPrimitives.black.copy(alpha = 0.75f)
+    val ImageScrim = NuvioPrimitives.black.copy(alpha = 0.65f)
+    val VideoControlsScrim = NuvioPrimitives.black.copy(alpha = 0.82f)
     val PosterFallback = BackgroundCard
 
     val DisabledContainer = SurfaceVariant.copy(alpha = 0.42f)
@@ -211,9 +213,9 @@ class NuvioColorScheme(
         imageScrim = ImageScrim,
         posterFallback = PosterFallback,
         videoControlsScrim = VideoControlsScrim,
-        glassPanelTop = Color(0xD64A4F59),
-        glassPanelMiddle = Color(0xCC3F454F),
-        glassPanelBottom = Color(0xC640474F),
+        glassPanelTop = Color(0xD62A2E35),
+        glassPanelMiddle = Color(0xCC22252B),
+        glassPanelBottom = Color(0xC61B1E23),
         glow = FocusRing.copy(alpha = 0.32f)
     )
 
@@ -284,7 +286,7 @@ object NuvioColors {
     val PrimaryVariant = NuvioPrimitives.neutral650
     val OnPrimary = NuvioPrimitives.white
     val TextPrimary = NuvioPrimitives.white
-    val TextSecondary = NuvioPrimitives.neutral400
+    val TextSecondary = Color(0xFFA0A0AB)
     val TextTertiary = NuvioPrimitives.neutral600
     val TextDisabled = NuvioPrimitives.neutral700
     val Rating = NuvioPrimitives.rating
@@ -292,7 +294,7 @@ object NuvioColors {
     val Success = NuvioPrimitives.success
     val Warning = NuvioPrimitives.warning
     val Info = NuvioPrimitives.info
-    val Border = NuvioPrimitives.neutral750
+    val Border = Color(0xFF2C2C35)
 
     val Secondary: Color
         @Composable
